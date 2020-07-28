@@ -1,6 +1,7 @@
 from io import BytesIO
 
 import keyboard
+import numpy as np
 import PyQt5
 import win32clipboard
 from PIL import Image
@@ -29,6 +30,7 @@ class Window(QtWidgets.QWidget):
         self.label = QtWidgets.QLabel(self)
         self.label.setGeometry(0, 0, WIDTH, HEIGHT)
         self.label.setPixmap(self.image)
+        self.setCursor(Qt.CrossCursor)
 
         self.front = QtWidgets.QWidget(self)
         self.front.setStyleSheet('background-color: rgba(0, 0, 0, 100)')
@@ -75,11 +77,7 @@ class Window(QtWidgets.QWidget):
             )
             self.rectangable.setPixmap(im)
             self.rectangable.show()
-
         return super().mouseMoveEvent(event)
-
-
-
 
 
 
@@ -95,8 +93,9 @@ class Window(QtWidgets.QWidget):
                 self.new_rect[0] - self.old_rect[0],
                 self.new_rect[1] - self.old_rect[1]
             ]
+
             if self.im[2] >= 10 and self.im[3] >= 10:
-    
+                
                 self.rectangable.setGeometry(
                     self.im[0],
                     self.im[1],
@@ -111,11 +110,17 @@ class Window(QtWidgets.QWidget):
                     self.im[3]
                 )
 
-                self.image = self.image.toImage()
-                self.image.save(f'{PATH}/file.png', "PNG")
+                self.image = self.image.toImage().convertToFormat(QtGui.QImage.Format.Format_RGBA8888)
+
+                width  = self.image.width()
+                height = self.image.height()
+
+                image_bits = self.image.bits()
+                image_bits.setsize(width * height * 4)
+                arr = np.array(image_bits).reshape((height, width, 4))
 
 
-                image = Image.open(f'{PATH}/file.png')
+                image = Image.fromarray(arr)
 
                 output = BytesIO()
                 image.convert("RGB").save(output, "BMP")
@@ -133,6 +138,8 @@ class Window(QtWidgets.QWidget):
                 del data
                 
                 self.hide()
+            else:
+                self.rectangable.hide()
 
         return super().mouseReleaseEvent(event)
 
@@ -194,9 +201,9 @@ if __name__ == "__main__":
     while True:
         if keyboard.is_pressed('prnt scrn'):
             window = Window()
-            window.close()
+            # window.close()
             App.exec_()
-        
+
         time.sleep(0.1)
 
     sys.exit()
