@@ -189,14 +189,6 @@ if __name__ == "__main__":
     desktop = QtWidgets.QDesktopWidget()
     WIDTH   = desktop.width()
     HEIGHT  = desktop.height()
-    
-    try:
-        with open('config.ini', 'r', encoding='utf-8') as f:
-            PATH = f.readlines()[0]
-    except FileNotFoundError:
-        with open('config.ini', 'w', encoding='utf-8') as f:
-            PATH = '.'
-            f.write(PATH)
 
     while True:
         if keyboard.is_pressed('prnt scrn'):
