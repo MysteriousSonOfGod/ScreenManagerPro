@@ -133,6 +133,10 @@ class Window(QtWidgets.QWidget):
                 win32clipboard.CloseClipboard()
 
                 del self.image
+                del image_bits
+                del image
+                del data
+                
                 self.hide()
             else:
                 self.rectangable.hide()
